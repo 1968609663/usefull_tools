@@ -1,0 +1,50 @@
+# coding:utf-8
+
+class ExtractContainer(object):
+    def __init__(self):
+        """用于处理多层嵌套容器，提取出key, value的关系"""
+        self._data = {}
+        self._data['seq_data'] = []
+
+    def extract(self, d):
+        if self.is_dict(d):
+            self.dict_proc(d)
+        if self.is_seq(d):
+            self.seq_proc(d)
+        return self._data
+
+    def is_dict(self, d):
+        return isinstance(d, dict)
+
+    def is_seq(self, d):
+        return isinstance(d, (list, tuple, set))
+
+    def is_container(self, d):
+        return not isinstance(d, (int, float, str,))
+
+    def seq_proc(self, d):
+        for i in d:
+            if self.is_container(i):
+                self.extract(i)
+            else:
+                self._data['seq_data'].append(i)
+
+    def dict_proc(self, d):
+        for k, v in d.items():
+            self._data[k] = v
+            if self.is_container(v):
+                self.extract(v)
+
+
+if __name__ == '__main__':
+    data = {'a': [1, 2], 'b': {'c': [3, {'d': 'f', 'e': {'g': 'h', 's': 9}}, {'m': 'n'}, 18]}}
+    ec = ExtractContainer().extract(data)
+    print(ec)
+    print(ec.get('a'))
+    print(ec.get('b'))
+    print(ec.get('c'))
+    print(ec.get('d'))
+    print(ec.get('e'))
+    print(ec.get('g'))
+    print(ec.get('s'))
+    print(ec.get('m'))
