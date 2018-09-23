@@ -9,10 +9,20 @@ python version: python3.x
 """
 import argparse
 import configparser
+from configparser import ConfigParser, BasicInterpolation, RawConfigParser
 import os
 import random
 from itertools import chain
 
+
+
+class Conf(ConfigParser):
+    def __init__(self, defaults=None):
+        ConfigParser.__init__(self, defaults=defaults)
+
+    # 这里重写了optionxform方法，直接返回选项名
+    def optionxform(self, optionstr):
+        return optionstr
 
 class ReciteWords(object):
     def __init__(self):
@@ -41,7 +51,6 @@ class ReciteWords(object):
             wd.append(u"{} >>> {}:{}    错误次数: {}".format(k[0], k[1], v[1], v[0]))
         res = '\n'.join(wd)
         print(u'=' * 10, u'需要复习如下如下', u'=' * 10)
-        print(res)
         with open(self.out, 'w', encoding='utf-8') as fp:
             fp.write(res)
         print(u'错误记录已经保存在文件: {}'.format(self.out))
@@ -77,7 +86,8 @@ class ReciteWords(object):
         :return:
         """
         data = {}
-        conf = configparser.ConfigParser()
+        #conf = configparser.ConfigParser()
+        conf = Conf()
         try:
             conf.read(self.filename, encoding='gbk')
         except UnicodeDecodeError:
@@ -104,10 +114,14 @@ class ReciteWords(object):
 
 
 if __name__ == '__main__':
+    import sys
+
+    sys.argv = [os.path.abspath(__file__), '--filename', r'C:\Users\allen\Desktop\words.ini', '--output', r'C:\Users\allen\Desktop\review_words.py']
 
     work = ReciteWords()
     try:
         work.run()
-    except (KeyboardInterrupt, KeyboardInterrupt, Exception):
+    except (KeyboardInterrupt, KeyboardInterrupt, Exception) as e:
+        print(e)
         print("退出程序")
     work.save()
