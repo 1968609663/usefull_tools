@@ -1,0 +1,63 @@
+# coding;utf-8
+"""
+提取bilibili下载后的视频到指定目录
+"""
+import json
+import shutil
+import os
+
+
+def read_json(p):
+    with open(p, 'rb') as fp:
+        data = json.load(fp)
+    return data
+
+
+def read_byte(p):
+    with open(p, 'rb') as fp:
+        data = fp.read()
+    return data
+
+
+def copy_file(src, dst):
+    shutil.copy(src=src, dst=dst)
+
+
+def detect_size(p):
+    size = os.path.getsize(p) / 1024 / 1024
+    if size > 5:
+        return True
+    return False
+
+
+def recur_get_files(p):
+    all_f = os.walk(p)
+    video_name = None
+    res = []
+    for pp, _, fs in all_f:
+        abs_fs = [os.path.join(pp, f) for f in fs]
+        tt_json = [i for i in abs_fs if os.path.basename(i).lower() == 'entry.json']
+        if tt_json:
+            video_name = read_json(tt_json[0]).get('page_data', {}).get('part', '')
+        valid_video = [i for i in abs_fs if detect_size(i)]
+        if valid_video:
+            res.append([video_name, valid_video])
+    return res
+
+
+def work(dst, data):
+    for video_name, video_seq in data:
+        for index, v in enumerate(video_seq, 1):
+            print(video_name)
+            _dst = os.path.join(dst, str(index) + '_' + video_name + '.mp4')
+            copy_file(src=v, dst=_dst)
+            print(v)
+            print(_dst)
+
+
+if __name__ == '__main__':
+    src_p = r'D:\资料\golang\学习视频\20926956'
+    dst_p = r'D:\资料\golang\学习视频\f3'
+
+    data = recur_get_files(src_p)
+    work(dst=dst_p, data=data)
