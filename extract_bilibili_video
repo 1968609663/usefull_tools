@@ -46,9 +46,11 @@ def recur_get_files(p):
 
 
 def work(dst, data):
+    index = 0
     for video_name, video_seq in data:
-        for index, v in enumerate(video_seq, 1):
+        for v in video_seq:
             print(video_name)
+            index += 1
             _dst = os.path.join(dst, str(index) + '_' + video_name + '.mp4')
             copy_file(src=v, dst=_dst)
             print(v)
