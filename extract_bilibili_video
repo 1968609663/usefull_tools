@@ -25,7 +25,7 @@ def copy_file(src, dst):
 
 def detect_size(p):
     size = os.path.getsize(p) / 1024 / 1024
-    if size > 5:
+    if size > 2:
         return True
     return False
 
@@ -46,20 +46,27 @@ def recur_get_files(p):
 
 
 def work(dst, data):
-    index = 0
     for video_name, video_seq in data:
-        for v in video_seq:
+        print(video_name)
+        print(video_seq)
+        print()
+        for index, v in enumerate(video_seq):
             print(video_name)
-            index += 1
-            _dst = os.path.join(dst, str(index) + '_' + video_name + '.mp4')
+            _dst = os.path.join(dst, video_name + '_' + str(index) + '.mp4')
             copy_file(src=v, dst=_dst)
             print(v)
             print(_dst)
+            print()
+
 
 
 if __name__ == '__main__':
-    src_p = r'D:\资料\golang\学习视频\20926956'
-    dst_p = r'D:\资料\golang\学习视频\f3'
+    src_path = r'D:\资料\golang\学习视频\11069727'
+    dst_path = r'D:\资料\golang\学习视频\f2'
 
-    data = recur_get_files(src_p)
-    work(dst=dst_p, data=data)
+
+    data = recur_get_files(src_path)
+    work(dst=dst_path, data=data)
+
+
+
